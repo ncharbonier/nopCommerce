@@ -137,4 +137,16 @@
   <LocaleResource Name="WindowsAuthentication">
     <Value>Use integrated Windows authentication</Value>
   </LocaleResource>
+  <LocaleResource Name="MySqlServer">
+    <Value>Use MySql database</Value>
+  </LocaleResource>
+  <LocaleResource Name="MySqlServerName">
+    <Value>MySql Server name</Value>
+  </LocaleResource>
+  <LocaleResource Name="MySqlServerUsername">
+    <Value>MySql Username</Value>
+  </LocaleResource>
+  <LocaleResource Name="MySqlServerPassword">
+    <Value>MySql Password</Value>
+  </LocaleResource>
 </Language>

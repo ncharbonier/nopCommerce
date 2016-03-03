@@ -3,6 +3,7 @@ using System.Linq;
 using Nop.Core.Data;
 using Nop.Core.Domain.Common;
 using Nop.Data;
+using System.Collections.Generic;
 
 namespace Nop.Services.Common
 {
@@ -46,8 +47,12 @@ namespace Nop.Services.Common
         {
             if (_commonSettings.UseStoredProceduresIfSupported && _dataProvider.StoredProceduredSupported)
             {
+                IEnumerable<int> result = null;
                 //stored procedures are enabled and supported by the database. 
-                var result = _dbContext.SqlQuery<int>("EXEC [FullText_IsSupported]");
+                if (_dataProvider.GetType() == typeof(MySqlDataProvider))
+                    result = _dbContext.SqlQuery<int>("CALL FullText_IsSupported");
+                else
+                    result = _dbContext.SqlQuery<int>("EXEC [FullText_IsSupported]");
                 return result.FirstOrDefault() > 0;
             }
             
@@ -63,7 +68,10 @@ namespace Nop.Services.Common
             if (_commonSettings.UseStoredProceduresIfSupported && _dataProvider.StoredProceduredSupported)
             {
                 //stored procedures are enabled and supported by the database.
-                _dbContext.ExecuteSqlCommand("EXEC [FullText_Enable]", true);
+                if (_dataProvider.GetType() == typeof(MySqlDataProvider))
+                    _dbContext.ExecuteSqlCommand("CALL FullText_Enable");
+                else
+                    _dbContext.ExecuteSqlCommand("EXEC [FullText_Enable]", true);
             }
             else
             {
@@ -79,7 +87,10 @@ namespace Nop.Services.Common
             if (_commonSettings.UseStoredProceduresIfSupported && _dataProvider.StoredProceduredSupported)
             {
                 //stored procedures are enabled and supported by the database.
-                _dbContext.ExecuteSqlCommand("EXEC [FullText_Disable]", true);
+                if (_dataProvider.GetType() == typeof(MySqlDataProvider))
+                    _dbContext.ExecuteSqlCommand("CALL FullText_Disable");
+                else
+                    _dbContext.ExecuteSqlCommand("EXEC [FullText_Disable]", true);
             }
             else
             {

@@ -187,24 +187,47 @@ namespace Nop.Services.Orders
                 query = query.Where(o => o.BillingAddress != null && !String.IsNullOrEmpty(o.BillingAddress.LastName) && o.BillingAddress.LastName.Contains(billingLastName));
             if (!String.IsNullOrEmpty(orderNotes))
                 query = query.Where(o => o.OrderNotes.Any(on => on.Note.Contains(orderNotes)));
-            
-			var item = (from oq in query
-						group oq by 1 into result
-						select new
-						           {
-                                       OrderCount = result.Count(),
-                                       OrderShippingExclTaxSum = result.Sum(o => o.OrderShippingExclTax),
-                                       OrderTaxSum = result.Sum(o => o.OrderTax), 
-                                       OrderTotalSum = result.Sum(o => o.OrderTotal)
-						           }
-					   ).Select(r => new OrderAverageReportLine
-                       {
-                           CountOrders = r.OrderCount,
-                           SumShippingExclTax = r.OrderShippingExclTaxSum, 
-                           SumTax = r.OrderTaxSum, 
-                           SumOrders = r.OrderTotalSum
-                       })
-                       .FirstOrDefault();
+
+
+            var grouping = (from oq in query
+                            group oq by 1 into result
+                            select result).AsEnumerable();
+
+            var item = (from result in grouping
+                        select new
+                                    {
+                                        OrderCount = result.Count(),
+                                        OrderShippingExclTaxSum = result.Sum(o => o.OrderShippingExclTax),
+                                        OrderTaxSum = result.Sum(o => o.OrderTax),
+                                        OrderTotalSum = result.Sum(o => o.OrderTotal)
+                                    }
+                        ).Select(r => new OrderAverageReportLine
+                        {
+                            SumTax = r.OrderTaxSum,
+                            CountOrders = r.OrderCount,
+                            SumShippingExclTax = r.OrderShippingExclTaxSum,
+                            SumOrders = r.OrderTotalSum
+                        })
+                        .FirstOrDefault();
+
+
+      //      var item = (from oq in query
+						//group oq by 1 into result
+						//select new
+						//           {
+      //                                 OrderCount = result.Count(),
+      //                                 OrderShippingExclTaxSum = result.Sum(o => o.OrderShippingExclTax),
+      //                                 OrderTaxSum = result.Sum(o => o.OrderTax), 
+      //                                 OrderTotalSum = result.Sum(o => o.OrderTotal)
+						//           }
+					 //  ).Select(r => new OrderAverageReportLine
+      //                 {
+      //                     CountOrders = r.OrderCount,
+      //                     SumShippingExclTax = r.OrderShippingExclTaxSum, 
+      //                     SumTax = r.OrderTaxSum, 
+      //                     SumOrders = r.OrderTotalSum
+      //                 })
+      //                 .FirstOrDefault();
 
 			item = item ?? new OrderAverageReportLine
 			                   {

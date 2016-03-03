@@ -108,9 +108,12 @@ namespace Nop.Services.Catalog
                     pStoreId.Value = storeId;
                     pStoreId.DbType = DbType.Int32;
 
-
+                    IEnumerable<ProductTagWithCount> result = null;
                     //invoke stored procedure
-                    var result = _dbContext.SqlQuery<ProductTagWithCount>(
+                    if (_dataProvider.GetType() == typeof(MySqlDataProvider))
+                        result = _dbContext.SqlQuery<ProductTagWithCount>(string.Format("set @StoreId = {0}; CALL ProductTagCountLoadAll(@StoreId)", storeId));
+                    else
+                        result = _dbContext.SqlQuery<ProductTagWithCount>(
                         "Exec ProductTagCountLoadAll @StoreId",
                         pStoreId);
 

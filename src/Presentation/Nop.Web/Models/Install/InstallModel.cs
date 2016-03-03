@@ -50,5 +50,19 @@ namespace Nop.Web.Models.Install
         public bool InstallSampleData { get; set; }
 
         public List<SelectListItem> AvailableLanguages { get; set; }
+
+        //MySql properties
+        public string MySqlConnectionInfo { get; set; }
+        [AllowHtml]
+        public string MySqlServerName { get; set; }
+        [AllowHtml]
+        public string MySqlDatabaseName { get; set; }
+        [AllowHtml]
+        public string MySqlUsername { get; set; }
+        [AllowHtml]
+        public string MySqlPassword { get; set; }
+        public bool MySqlServerCreateDatabase { get; set; }
+        [AllowHtml]
+        public string MySqlDatabaseConnectionString { get; set; }
     }
 }

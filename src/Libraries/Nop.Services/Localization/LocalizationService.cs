@@ -391,7 +391,14 @@ namespace Nop.Services.Localization
                 pXmlPackage.DbType = DbType.Xml;
 
                 //long-running query. specify timeout (600 seconds)
-                _dbContext.ExecuteSqlCommand("EXEC [LanguagePackImport] @LanguageId, @XmlPackage", false, 600, pLanguageId, pXmlPackage);
+                if (_dataProvider.GetType() == typeof(MySqlDataProvider))
+                    //I don't like doing this with string.format, but it won't work the proper way...unless
+                    //I run the string.format way first, then running the proper way works...I don't know why
+                    //Also, need to HtmlDecode since MySql doesn't handle that like MSSql
+                    _dbContext.ExecuteSqlCommand(string.Format("set @LanguageId = {0}; set @xml = '{1}'; CALL LanguagePackImport(@LanguageId, @xml)", language.Id, System.Web.HttpUtility.HtmlDecode(xml.Replace("'", "''"))), false, 600);
+                //_dbContext.ExecuteSqlCommand("CALL LanguagePackImport(@LanguageId, @XmlPackage)", 600, pLanguageId, pXmlPackage);
+                else
+                    _dbContext.ExecuteSqlCommand("EXEC [LanguagePackImport] @LanguageId, @XmlPackage", false, 600, pLanguageId, pXmlPackage);
             }
             else
             {

@@ -16,6 +16,7 @@ using Nop.Services.Security;
 using Nop.Web.Framework.Security;
 using Nop.Web.Infrastructure.Installation;
 using Nop.Web.Models.Install;
+using MySql.Data.MySqlClient;
 
 namespace Nop.Web.Controllers
 {
@@ -107,7 +108,43 @@ namespace Nop.Web.Controllers
                 return string.Format(_locService.GetResource("DatabaseCreationError"), ex.Message);
             }
         }
-        
+
+        /// <summary>
+        /// Creates a database on the MySql server.
+        /// </summary>
+        /// <param name="connectionString">Connection string</param>
+        /// <param name="collation">Server collation; the default one will be used if not specified</param>
+        /// <returns>Error</returns>
+        private string createMySqlDatabase(string connectionString, string collation)
+        {
+            try
+            {
+                //parse database name
+                var builder = new MySqlConnectionStringBuilder(connectionString);
+                var databaseName = builder.Database;
+                //now create connection string to unspecified dabatase.
+                builder.Database = string.Empty;
+                var masterCatalogConnectionString = builder.ToString();
+                string query = string.Format("CREATE DATABASE {0}", databaseName);
+                if (!String.IsNullOrWhiteSpace(collation))
+                    query = string.Format("{0} COLLATE {1}", query, collation);
+                using (var conn = new MySqlConnection(masterCatalogConnectionString))
+                {
+                    conn.Open();
+                    using (var command = new MySqlCommand(query, conn))
+                    {
+                        command.ExecuteNonQuery();
+                    }
+                }
+
+                return string.Empty;
+            }
+            catch (Exception ex)
+            {
+                return string.Format(_locService.GetResource("DatabaseCreationError"), ex.Message);
+            }
+        }
+
         /// <summary>
         /// Create contents of connection strings used by the SqlConnection class
         /// </summary>
@@ -249,6 +286,38 @@ namespace Nop.Web.Controllers
                     }
                 }
             }
+            else if (model.DataProvider.Equals("mysql", StringComparison.InvariantCultureIgnoreCase))
+            {
+                if (model.MySqlConnectionInfo.Equals("mysqlconnectioninfo_raw", StringComparison.InvariantCultureIgnoreCase))
+                {
+                    //raw connection string
+                    if (string.IsNullOrEmpty(model.MySqlDatabaseConnectionString))
+                        ModelState.AddModelError(string.Empty, _locService.GetResource("ConnectionStringRequired"));
+
+                    try
+                    {
+                        //try to create connection string
+                        new MySqlConnectionStringBuilder(model.MySqlDatabaseConnectionString);
+                    }
+                    catch
+                    {
+                        ModelState.AddModelError(string.Empty, _locService.GetResource("ConnectionStringWrongFormat"));
+                    }
+                }
+                else
+                {
+                    //values
+                    if (string.IsNullOrEmpty(model.MySqlServerName))
+                        ModelState.AddModelError("", _locService.GetResource("SqlServerNameRequired"));
+                    if (string.IsNullOrEmpty(model.MySqlDatabaseName))
+                        ModelState.AddModelError("", _locService.GetResource("DatabaseNameRequired"));
+
+                    if (string.IsNullOrEmpty(model.MySqlUsername))
+                        ModelState.AddModelError("", _locService.GetResource("SqlServerUsernameRequired"));
+                    if (string.IsNullOrEmpty(model.MySqlPassword))
+                        ModelState.AddModelError("", _locService.GetResource("SqlServerPasswordRequired"));
+                }
+            }
 
 
             //Consider granting access rights to the resource to the ASP.NET request identity. 
@@ -319,6 +388,52 @@ namespace Nop.Web.Controllers
                         {
                             //check whether database exists
                             if (!SqlServerDatabaseExists(connectionString))
+                                throw new Exception(_locService.GetResource("DatabaseNotExists"));
+                        }
+                    }
+                    else if (model.DataProvider.Equals("mysql", StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        //MySql
+
+                        if (model.MySqlConnectionInfo.Equals("mysqlconnectioninfo_raw", StringComparison.InvariantCultureIgnoreCase))
+                        {
+                            //raw connection string
+
+                            //we know that MARS option is required when using Entity Framework
+                            //let's ensure that it's specified
+                            var sqlCsb = new MySqlConnectionStringBuilder(model.MySqlDatabaseConnectionString);
+                            //sqlCsb.MultipleActiveResultSets = true;
+                            connectionString = sqlCsb.ToString();
+                        }
+                        else
+                        {
+                            //values
+                            connectionString = createMySqlConnectionString(
+                                model.MySqlServerName, model.MySqlDatabaseName,
+                                model.MySqlUsername, model.MySqlPassword, 200000000);
+                        }
+
+                        if (model.MySqlServerCreateDatabase)
+                        {
+                            if (!mySqlDatabaseExists(connectionString))
+                            {
+                                //create database
+                                var collation = string.Empty;
+                                var errorCreatingDatabase = createMySqlDatabase(connectionString, collation);
+                                if (!String.IsNullOrEmpty(errorCreatingDatabase))
+                                    throw new Exception(errorCreatingDatabase);
+                                else
+                                {
+                                    //Database cannot be created sometimes. Weird! Seems to be Entity Framework issue
+                                    //that's just wait 3 seconds
+                                    Thread.Sleep(3000);
+                                }
+                            }
+                        }
+                        else
+                        {
+                            //check whether database exists
+                            if (!mySqlDatabaseExists(connectionString))
                                 throw new Exception(_locService.GetResource("DatabaseNotExists"));
                         }
                     }
@@ -435,6 +550,67 @@ namespace Nop.Web.Controllers
 
             //Redirect to home page
             return RedirectToRoute("HomePage");
+        }
+
+        private bool mySqlDatabaseExists(string connectionString)
+        {
+            try
+            {
+                //just try to connect
+                using (var conn = new MySqlConnection(connectionString))
+                {
+                    conn.Open();
+                }
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        private string createMySqlDatabase(string connectionString)
+        {
+            try
+            {
+                //parse database name
+                var builder = new MySqlConnectionStringBuilder(connectionString);
+                var databaseName = builder.Database;
+                //now create connection string to 'master' dabatase. It always exists.
+                builder.Database = string.Empty; // = "master";
+                var masterCatalogConnectionString = builder.ToString();
+                string query = string.Format("CREATE DATABASE {0} COLLATE utf8_unicode_ci", databaseName);
+
+                using (var conn = new MySqlConnection(masterCatalogConnectionString))
+                {
+                    conn.Open();
+                    using (var command = new MySqlCommand(query, conn))
+                    {
+                        command.ExecuteNonQuery();
+                    }
+                }
+
+                return string.Empty;
+            }
+            catch (Exception ex)
+            {
+                return string.Format("An error occured when creating database: {0}", ex.Message);
+            }
+        }
+
+        private string createMySqlConnectionString(string serverName, string databaseName, string userName, string password, uint timeout = 0)
+        {
+            var builder = new MySqlConnectionStringBuilder();
+            builder.Server = serverName;
+            builder.Database = databaseName.ToLower();
+            builder.UserID = userName;
+            builder.Password = password;
+            builder.PersistSecurityInfo = false;
+            builder.AllowUserVariables = true;
+            builder.DefaultCommandTimeout = 30000;
+
+            builder.ConnectionTimeout = timeout;
+            return builder.ConnectionString;
         }
 
         #endregion

@@ -61,9 +61,15 @@
                 var selectedProvider = $("input[name=DataProvider]:checked").attr('id');
                 if (selectedProvider == 'provider_sqlce') {
                     $('#sqlConnectionInfo').hide();
+                    $('#mySqlConnectionInfo').hide();
                 }
                 else if (selectedProvider == 'provider_sqlserver') {
                     $('#sqlConnectionInfo').show();
+                    $('#mySqlConnectionInfo').hide();
+                }
+                else if (selectedProvider == 'provider_mysql') {
+                    $('#sqlConnectionInfo').hide();
+                    $('#mySqlConnectionInfo').show();
                 }
             }
 
@@ -313,6 +319,103 @@
                                                     </div>
                                                 </td>
                                             </tr>
+
+                                            <tr>
+                                                <td colspan="2" align="left">
+                                                    @Html.RadioButton("DataProvider", "mysql", (Model.DataProvider == "mysql"), new { id = "provider_mysql" })
+                                                    <label for="provider_mysql">
+                                                        @ILS.GetResource("MySqlServer")
+                                                    </label>
+                                                    <div id="mySqlConnectionInfo">
+                                                        <br />
+                                                        <hr />
+                                                        <br />
+                                                        <div>
+                                                            <table>
+                                                                <tr>
+                                                                    <td nowrap="nowrap" align="left">
+                                                                        <label for="MySqlServerCreateDatabase">
+                                                                            @ILS.GetResource("CreateDatabaseIfDoesNotExist"):
+                                                                        </label>
+                                                                    </td>
+                                                                    <td width="100%">
+                                                                        @Html.CheckBoxFor(x => x.MySqlServerCreateDatabase)
+                                                                    </td>
+                                                                </tr>
+                                                            </table>
+                                                        </div>
+                                                        <br />
+                                                        @Html.RadioButton("MySqlConnectionInfo", "mysqlconnectioninfo_values", (Model.MySqlConnectionInfo == "mysqlconnectioninfo_values"), new { id = "mysqlconnectioninfo_values" })
+                                                        <label for="mysqlconnectioninfo_values">
+                                                            @ILS.GetResource("ConnectionStringValues")
+                                                        </label>
+                                                        @Html.RadioButton("MySqlConnectionInfo", "mysqlconnectioninfo_raw", (Model.SqlConnectionInfo == "mysqlconnectioninfo_raw"), new { id = "mysqlconnectioninfo_raw" })
+                                                        <label for="sqlconnectioninfo_raw">
+                                                            @ILS.GetResource("RawConnectionString")
+                                                        </label>
+                                                        <div id="mySqlDatabaseInfo">
+                                                            <table>
+                                                                <tr>
+                                                                    <td nowrap="nowrap" align="left">
+                                                                        <label for="SqlServerName">
+                                                                            @ILS.GetResource("MySqlServerName"):
+                                                                        </label>
+                                                                    </td>
+                                                                    <td width="100%">
+                                                                        @Html.TextBoxFor(x => x.MySqlServerName, new { @class = "textbox" })
+                                                                    </td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <td nowrap="nowrap" align="left">
+                                                                        <label for="MySqlDatabaseName">
+                                                                            @ILS.GetResource("DatabaseName"):
+                                                                        </label>
+                                                                    </td>
+                                                                    <td width="100%">
+                                                                        @Html.TextBoxFor(x => x.MySqlDatabaseName, new { @class = "textbox" })
+                                                                    </td>
+                                                                </tr>
+                                                                <tr id="mySqlServerUsername">
+                                                                    <td nowrap="nowrap" align="left">
+                                                                        <label for="MySqlUsername">
+                                                                            @ILS.GetResource("MySqlServerUsername"):
+                                                                        </label>
+                                                                    </td>
+                                                                    <td width="100%">
+                                                                        @Html.TextBoxFor(x => x.MySqlUsername, new { @class = "textbox" })
+                                                                    </td>
+                                                                </tr>
+                                                                <tr id="mySqlServerPassword">
+                                                                    <td nowrap="nowrap" align="left">
+                                                                        <label for="MySqlPassword">
+                                                                            @ILS.GetResource("MySqlServerPassword"):
+                                                                        </label>
+                                                                    </td>
+                                                                    <td width="100%">
+                                                                        @Html.PasswordFor(x => x.MySqlPassword, new { @class = "textbox" })
+                                                                    </td>
+                                                                </tr>
+                                                            </table>
+                                                        </div>
+                                                        <div id="mySqlDatabaseConnectionString">
+                                                            <span style="white-space: nowrap;">
+                                                                <label for="MySqlDatabaseConnectionString">
+                                                                    @ILS.GetResource("ConnectionString"):
+                                                                </label>
+                                                                @Html.TextBoxFor(x => x.MySqlDatabaseConnectionString, new { @class = "textbox", style = "width:90%;" })
+                                                            </span>
+                                                            <br />
+                                                            <span class="hint">
+                                                                @ILS.GetResource("Example"):<br />
+                                                                server=127.0.0.1;uid=root;pwd=12345;database=test;
+                                                            <br />
+                                                            Find more info <a href="https://dev.mysql.com/doc/connector-net/en/connector-net-programming-connecting-open.html" target="_blank">here</a>
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                        </tr>
+
                                             <tr>
                                                 <td colspan="2">
                                                     &nbsp;

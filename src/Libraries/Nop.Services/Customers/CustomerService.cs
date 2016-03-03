@@ -90,7 +90,7 @@ namespace Nop.Services.Customers
             IGenericAttributeService genericAttributeService,
             IDataProvider dataProvider,
             IDbContext dbContext,
-            IEventPublisher eventPublisher, 
+            IEventPublisher eventPublisher,
             CustomerSettings customerSettings,
             CommonSettings commonSettings)
         {
@@ -119,7 +119,7 @@ namespace Nop.Services.Customers
         #region Methods
 
         #region Customers
-        
+
         /// <summary>
         /// Gets all customers
         /// </summary>
@@ -194,7 +194,7 @@ namespace Nop.Services.Customers
                 string dateOfBirthStr = monthOfBirth.ToString("00", CultureInfo.InvariantCulture) + "-" + dayOfBirth.ToString("00", CultureInfo.InvariantCulture);
                 //EndsWith is not supported by SQL Server Compact
                 //so let's use the following workaround http://social.msdn.microsoft.com/Forums/is/sqlce/thread/0f810be1-2132-4c59-b9ae-8f7013c0cc00
-                
+
                 //we also cannot use Length function in SQL Server Compact (not supported in this context)
                 //z.Attribute.Value.Length - dateOfBirthStr.Length = 5
                 //dateOfBirthStr.Length = 5
@@ -211,7 +211,7 @@ namespace Nop.Services.Customers
                 string dateOfBirthStr = dayOfBirth.ToString("00", CultureInfo.InvariantCulture);
                 //EndsWith is not supported by SQL Server Compact
                 //so let's use the following workaround http://social.msdn.microsoft.com/Forums/is/sqlce/thread/0f810be1-2132-4c59-b9ae-8f7013c0cc00
-                
+
                 //we also cannot use Length function in SQL Server Compact (not supported in this context)
                 //z.Attribute.Value.Length - dateOfBirthStr.Length = 8
                 //dateOfBirthStr.Length = 2
@@ -274,7 +274,7 @@ namespace Nop.Services.Customers
                     query.Where(c => c.ShoppingCartItems.Any(x => x.ShoppingCartTypeId == sctId)) :
                     query.Where(c => c.ShoppingCartItems.Any());
             }
-            
+
             query = query.OrderByDescending(c => c.CreatedOnUtc);
 
             var customers = new PagedList<Customer>(query, pageIndex, pageSize);
@@ -313,7 +313,7 @@ namespace Nop.Services.Customers
             query = query.Where(c => !c.Deleted);
             if (customerRoleIds != null && customerRoleIds.Length > 0)
                 query = query.Where(c => c.CustomerRoles.Select(cr => cr.Id).Intersect(customerRoleIds).Any());
-            
+
             query = query.OrderByDescending(c => c.LastActivityDateUtc);
             var customers = new PagedList<Customer>(query, pageIndex, pageSize);
             return customers;
@@ -353,7 +353,7 @@ namespace Nop.Services.Customers
         {
             if (customerId == 0)
                 return null;
-            
+
             return _customerRepository.GetById(customerId);
         }
 
@@ -453,7 +453,7 @@ namespace Nop.Services.Customers
             var customer = query.FirstOrDefault();
             return customer;
         }
-        
+
         /// <summary>
         /// Insert a guest customer
         /// </summary>
@@ -478,7 +478,7 @@ namespace Nop.Services.Customers
 
             return customer;
         }
-        
+
         /// <summary>
         /// Insert a customer
         /// </summary>
@@ -493,7 +493,7 @@ namespace Nop.Services.Customers
             //event notification
             _eventPublisher.EntityInserted(customer);
         }
-        
+
         /// <summary>
         /// Updates the customer
         /// </summary>
@@ -526,7 +526,7 @@ namespace Nop.Services.Customers
         {
             if (customer == null)
                 throw new ArgumentNullException();
-            
+
             //clear entered coupon codes
             if (clearCouponCodes)
             {
@@ -559,10 +559,10 @@ namespace Nop.Services.Customers
             {
                 _genericAttributeService.SaveAttribute<string>(customer, SystemCustomerAttributeNames.SelectedPaymentMethod, null, storeId);
             }
-            
+
             UpdateCustomer(customer);
         }
-        
+
         /// <summary>
         /// Delete guest customer records
         /// </summary>
@@ -601,13 +601,18 @@ namespace Nop.Services.Customers
                 pTotalRecordsDeleted.DbType = DbType.Int32;
 
                 //invoke stored procedure
-                _dbContext.ExecuteSqlCommand(
-                    "EXEC [DeleteGuests] @OnlyWithoutShoppingCart, @CreatedFromUtc, @CreatedToUtc, @TotalRecordsDeleted OUTPUT",
-                    false, null,
-                    pOnlyWithoutShoppingCart,
-                    pCreatedFromUtc,
-                    pCreatedToUtc,
-                    pTotalRecordsDeleted);
+                if (_dataProvider.GetType() == typeof(MySqlDataProvider))
+                {
+                    //_dbContext.ExecuteSqlCommand(string.Format("set @OnlyWithoutShoppingCart = {0}; set @CreatedFromUtc = '{1}'; set @CreatedToUtc = '{2}'; set @TotalRecordsDeleted = '{2}'; CALL DeleteGuests(@LanguageId, @xml)", language.Id, System.Web.HttpUtility.HtmlDecode(xml.Replace("'", "''"))), 600);
+                }
+                else
+                    _dbContext.ExecuteSqlCommand(
+                        "EXEC [DeleteGuests] @OnlyWithoutShoppingCart, @CreatedFromUtc, @CreatedToUtc, @TotalRecordsDeleted OUTPUT",
+                        false, null,
+                        pOnlyWithoutShoppingCart,
+                        pCreatedFromUtc,
+                        pCreatedToUtc,
+                        pTotalRecordsDeleted);
 
                 int totalRecordsDeleted = (pTotalRecordsDeleted.Value != DBNull.Value) ? Convert.ToInt32(pTotalRecordsDeleted.Value) : 0;
                 return totalRecordsDeleted;
@@ -687,8 +692,8 @@ namespace Nop.Services.Customers
                 query = from c in query
                         group c by c.Id
                             into cGroup
-                            orderby cGroup.Key
-                            select cGroup.FirstOrDefault();
+                        orderby cGroup.Key
+                        select cGroup.FirstOrDefault();
                 query = query.OrderBy(c => c.Id);
                 var customers = query.ToList();
 
@@ -720,7 +725,7 @@ namespace Nop.Services.Customers
         }
 
         #endregion
-        
+
         #region Customer roles
 
         /// <summary>
@@ -796,7 +801,7 @@ namespace Nop.Services.Customers
                 return customerRoles;
             });
         }
-        
+
         /// <summary>
         /// Inserts a customer role
         /// </summary>
