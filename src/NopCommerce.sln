@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.23107.0
+VisualStudioVersion = 14.0.24720.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Libraries", "Libraries", "{E4ACA93B-D3DE-4557-B069-F1DB42925A4B}"
 EndProject
@@ -84,6 +84,10 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nop.Plugin.Misc.FacebookShop", "Plugins\Nop.Plugin.Misc.FacebookShop\Nop.Plugin.Misc.FacebookShop.csproj", "{6216A5CA-8599-4B53-8E70-F21CC6D4273C}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nop.Plugin.ExchangeRate.EcbExchange", "Plugins\Nop.Plugin.ExchangeRate.EcbExchange\Nop.Plugin.ExchangeRate.EcbExchange.csproj", "{6DF00C56-EC49-4AB8-8B29-404E3694026C}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DatabaseSchema", "DatabaseSchema", "{65FA9937-6BC0-4B1A-A7ED-8E96702C132A}"
+EndProject
+Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "DatabaseSchema", "DatabaseSchema\DatabaseSchema.sqlproj", "{1EAEEB7F-DF5A-4DC4-82C2-B8DCB8F3B07A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -467,6 +471,24 @@ Global
 		{6DF00C56-EC49-4AB8-8B29-404E3694026C}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{6DF00C56-EC49-4AB8-8B29-404E3694026C}.Release|x86.ActiveCfg = Release|Any CPU
 		{6DF00C56-EC49-4AB8-8B29-404E3694026C}.Release|x86.Build.0 = Release|Any CPU
+		{1EAEEB7F-DF5A-4DC4-82C2-B8DCB8F3B07A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1EAEEB7F-DF5A-4DC4-82C2-B8DCB8F3B07A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1EAEEB7F-DF5A-4DC4-82C2-B8DCB8F3B07A}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{1EAEEB7F-DF5A-4DC4-82C2-B8DCB8F3B07A}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{1EAEEB7F-DF5A-4DC4-82C2-B8DCB8F3B07A}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{1EAEEB7F-DF5A-4DC4-82C2-B8DCB8F3B07A}.Debug|Mixed Platforms.Deploy.0 = Debug|Any CPU
+		{1EAEEB7F-DF5A-4DC4-82C2-B8DCB8F3B07A}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{1EAEEB7F-DF5A-4DC4-82C2-B8DCB8F3B07A}.Debug|x86.Build.0 = Debug|Any CPU
+		{1EAEEB7F-DF5A-4DC4-82C2-B8DCB8F3B07A}.Debug|x86.Deploy.0 = Debug|Any CPU
+		{1EAEEB7F-DF5A-4DC4-82C2-B8DCB8F3B07A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1EAEEB7F-DF5A-4DC4-82C2-B8DCB8F3B07A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1EAEEB7F-DF5A-4DC4-82C2-B8DCB8F3B07A}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{1EAEEB7F-DF5A-4DC4-82C2-B8DCB8F3B07A}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{1EAEEB7F-DF5A-4DC4-82C2-B8DCB8F3B07A}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{1EAEEB7F-DF5A-4DC4-82C2-B8DCB8F3B07A}.Release|Mixed Platforms.Deploy.0 = Release|Any CPU
+		{1EAEEB7F-DF5A-4DC4-82C2-B8DCB8F3B07A}.Release|x86.ActiveCfg = Release|Any CPU
+		{1EAEEB7F-DF5A-4DC4-82C2-B8DCB8F3B07A}.Release|x86.Build.0 = Release|Any CPU
+		{1EAEEB7F-DF5A-4DC4-82C2-B8DCB8F3B07A}.Release|x86.Deploy.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -509,6 +531,7 @@ Global
 		{9978B382-0BCD-4621-B6B5-52E0E3B5F464} = {7881B112-7843-4542-B1F7-F99553FB9BB7}
 		{6216A5CA-8599-4B53-8E70-F21CC6D4273C} = {7881B112-7843-4542-B1F7-F99553FB9BB7}
 		{6DF00C56-EC49-4AB8-8B29-404E3694026C} = {7881B112-7843-4542-B1F7-F99553FB9BB7}
+		{1EAEEB7F-DF5A-4DC4-82C2-B8DCB8F3B07A} = {65FA9937-6BC0-4B1A-A7ED-8E96702C132A}
 	EndGlobalSection
 	GlobalSection(NDepend) = preSolution
 		Project = ".\NopCommerce.ndproj"
